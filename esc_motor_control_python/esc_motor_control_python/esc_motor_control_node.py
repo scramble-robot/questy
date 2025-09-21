@@ -50,9 +50,9 @@ class ESCMotorControlNode(Node):
         self.declare_parameter('test_mode', False)
         self.declare_parameter('joy_topic', 'joy')
         self.declare_parameter('cmd_vel_topic', 'cmd_vel')
-        self.declare_parameter('min_pulse_width', 1.0)  # ms
-        self.declare_parameter('max_pulse_width', 2.0)  # ms
-        self.declare_parameter('neutral_pulse_width', 1.5)  # ms
+        self.declare_parameter('min_pulse_width', 0)  # us
+        self.declare_parameter('max_pulse_width', 2000)  # us
+        self.declare_parameter('neutral_pulse_width', 0)  # us
         
         # パラメータの取得
         self.pwm_pin = self.get_parameter('pwm_pin').get_parameter_value().integer_value
@@ -65,9 +65,9 @@ class ESCMotorControlNode(Node):
         self.test_mode = self.get_parameter('test_mode').get_parameter_value().bool_value
         self.joy_topic = self.get_parameter('joy_topic').get_parameter_value().string_value
         self.cmd_vel_topic = self.get_parameter('cmd_vel_topic').get_parameter_value().string_value
-        self.min_pulse_width = self.get_parameter('min_pulse_width').get_parameter_value().double_value / 1000.0
-        self.max_pulse_width = self.get_parameter('max_pulse_width').get_parameter_value().double_value / 1000.0
-        self.neutral_pulse_width = self.get_parameter('neutral_pulse_width').get_parameter_value().double_value / 1000.0
+        self.min_pulse_width = self.get_parameter('min_pulse_width').get_parameter_value().integer_value / 1000000.0
+        self.max_pulse_width = self.get_parameter('max_pulse_width').get_parameter_value().integer_value / 1000000.0
+        self.neutral_pulse_width = self.get_parameter('neutral_pulse_width').get_parameter_value().integer_value / 1000000.0
         
         # 内部状態
         self.current_speed = 0.0
@@ -148,8 +148,8 @@ class ESCMotorControlNode(Node):
                 self.get_logger().info('=== ESC初期化プロセス ===')
                 self.get_logger().warn('⚠️  初期化中はモーターに触れないでください')
                 
-                # ESC初期化シーケンス：中立位置から開始
-                self.servo.value = 0  # 中立位置（1.5ms）
+                # ESC初期化シーケンス：中立位置（1500us）から開始
+                self.servo.value = 0.0  # 中立位置（1500us = (1000+2000)/2）
                 time.sleep(2)  # ESCの初期化待機
                 
                 self.get_logger().info('✅ ESCが初期化されました。停止状態で待機中...')
@@ -178,12 +178,8 @@ class ESCMotorControlNode(Node):
             try:
                 if self.servo is not None:
                     # 実際のESC制御
-                    if speed == 0.0:
-                        # 停止：中立位置
-                        self.servo.value = 0
-                    else:
-                        # -1.0 to 1.0 の範囲でESC制御
-                        self.servo.value = speed
+                    # ESCでは0.0が中立位置（1500us）、-1.0が最小（1000us）、1.0が最大（2000us）
+                    self.servo.value = speed
                         
                     self.get_logger().debug(f'ESC速度設定: {speed:.3f}')
                     

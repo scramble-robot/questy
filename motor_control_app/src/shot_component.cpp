@@ -20,9 +20,9 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
   this->declare_parameter("pan_axis", 7);                // パン軸（十字キー上下など）
   this->declare_parameter("pan_step_angle", 5.0);        // パンステップサイズ（度）
   this->declare_parameter("pan_min_angle", 0.0);         // パン最小角度（度）
-  this->declare_parameter("pan_max_angle", 360.0);       // パン最大角度（度）
+  this->declare_parameter("pan_max_angle", 70.0);       // パン最大角度（度）
   this->declare_parameter("fire_angle", 130.0);          // 射撃角度（度）
-  this->declare_parameter("home_angle", 180.0);          // ホーム角度（度）
+  this->declare_parameter("home_angle", 100.0);          // ホーム角度（度）
   this->declare_parameter("fire_duration_ms", 300);      // 射撃持続時間（ミリ秒）
   this->declare_parameter("command_rate_limit_ms", 50);  // コマンド間隔制限（ミリ秒）
 
@@ -254,24 +254,26 @@ bool ShotComponent::canSendCommand() {
   return elapsed >= command_rate_limit_ms_;
 }
 
-// 角度からサーボ位置への変換（制限範囲 -> 0-4095）
+// 角度からサーボ位置への変換（角度 -> 0-4095）
 int ShotComponent::angleToServoPosition(double angle_deg) {
-  // 角度を制限範囲にクランプ
-  angle_deg = clampAngle(angle_deg);
-  // サーボ位置に変換（制限範囲をサーボの全範囲にマッピング）
-  double range = pan_max_angle_ - pan_min_angle_;
-  double normalized = (angle_deg - pan_min_angle_) / range;
-  return static_cast<int>(normalized * 4096.0);
+  // 角度を直接サーボ位置に変換（0度=0, 360度=4095）
+  // 角度を0-360度の範囲で正規化
+  while (angle_deg < 0) angle_deg += 360.0;
+  while (angle_deg >= 360.0) angle_deg -= 360.0;
+  
+  // サーボ位置に変換
+  double normalized = angle_deg / 360.0;
+  int position = static_cast<int>(normalized * 4096.0);
+  return std::max(0, std::min(4095, position));
 }
 
-// サーボ位置から角度への変換（0-4095 -> 制限範囲）
+// サーボ位置から角度への変換（0-4095 -> 角度）
 double ShotComponent::servoPositionToAngle(int position) {
   // 位置を0-4095の範囲にクランプ
   position = std::max(0, std::min(4095, position));
-  // 角度に変換（サーボの全範囲を制限範囲にマッピング）
+  // 角度に変換（0-4095 -> 0-360度）
   double normalized = static_cast<double>(position) / 4096.0;
-  double range = pan_max_angle_ - pan_min_angle_;
-  return pan_min_angle_ + (normalized * range);
+  return normalized * 360.0;
 }
 
 }  // namespace motor_control_app

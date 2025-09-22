@@ -12,7 +12,7 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
       last_pan_value_(0.0),
       current_pan_position_(2048) {
   // パラメーター宣言
-  this->declare_parameter("port", "/dev/ttyUSB0");
+  this->declare_parameter("port", "/dev/servo");
   this->declare_parameter("baudrate", 115200);
   this->declare_parameter("pan_servo_id", 1);
   this->declare_parameter("trigger_servo_id", 3);

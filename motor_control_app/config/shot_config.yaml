@@ -1,6 +1,6 @@
 shot_component:
   ros__parameters:
-    port: "/dev/ttyUSB0"
+    port: "/dev/servo"
     baudrate: 115200
     pan_servo_id: 11
     trigger_servo_id: 10

@@ -27,6 +27,12 @@ install(FILES
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(DIRECTORY
+  config/
+  DESTINATION share/${PROJECT_NAME}/config
+  FILES_MATCHING PATTERN "*.yaml"
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

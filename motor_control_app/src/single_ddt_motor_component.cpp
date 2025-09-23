@@ -75,7 +75,7 @@ SingleDdtMotorComponent::~SingleDdtMotorComponent() {
 void SingleDdtMotorComponent::initializeParameters() {
   // パラメータの宣言とデフォルト値の設定
   this->declare_parameter("serial_port", "/dev/ttyACM0");
-  this->declare_parameter("baud_rate", 115200);
+  this->declare_parameter("baud_rate", 57600);
   this->declare_parameter("wheel_radius", 0.1);
   this->declare_parameter("motor_id", 1);
   this->declare_parameter("max_motor_rpm", 100);
@@ -93,25 +93,25 @@ void SingleDdtMotorComponent::initializeParameters() {
   status_publish_rate_ = this->get_parameter("status_publish_rate").as_double();
   watchdog_timeout_ = this->get_parameter("watchdog_timeout").as_double();
 
-  RCLCPP_INFO(this->get_logger(), "Parameters initialized:");
-  RCLCPP_INFO(this->get_logger(), "  serial_port: %s", serial_port_.c_str());
-  RCLCPP_INFO(this->get_logger(), "  baud_rate: %d", baud_rate_);
-  RCLCPP_INFO(this->get_logger(), "  motor_id: %d", motor_id_);
-  RCLCPP_INFO(this->get_logger(), "  max_motor_rpm: %d", max_motor_rpm_);
-  RCLCPP_INFO(this->get_logger(), "  velocity_scale_factor: %.2f", velocity_scale_factor_);
+  //   RCLCPP_INFO(this->get_logger(), "Parameters initialized:");
+  //   RCLCPP_INFO(this->get_logger(), "  serial_port: %s", serial_port_.c_str());
+  //   RCLCPP_INFO(this->get_logger(), "  baud_rate: %d", baud_rate_);
+  //   RCLCPP_INFO(this->get_logger(), "  motor_id: %d", motor_id_);
+  //   RCLCPP_INFO(this->get_logger(), "  max_motor_rpm: %d", max_motor_rpm_);
+  //   RCLCPP_INFO(this->get_logger(), "  velocity_scale_factor: %.2f", velocity_scale_factor_);
 }
 
 bool SingleDdtMotorComponent::initializeMotorLib() {
   try {
     motor_lib_ = std::make_shared<motor_control_lib::DdtMotorLib>(serial_port_, baud_rate_);
 
-    if (!motor_lib_->initialize()) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to initialize DDT motor library");
+    if (!motor_lib_->setMaxRpm(max_motor_rpm_)) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to set max RPM");
       return false;
     }
 
-    if (!motor_lib_->setMaxRpm(max_motor_rpm_)) {
-      RCLCPP_ERROR(this->get_logger(), "Failed to set max RPM");
+    if (!motor_lib_->initialize()) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to initialize DDT motor library");
       return false;
     }
 

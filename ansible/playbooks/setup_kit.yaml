@@ -99,6 +99,7 @@
           - python3-rpi.gpio
           - python3-gpiozero
           - libraspberrypi-bin
+          - libserial-dev
         state: present
         update_cache: true
 
@@ -159,6 +160,7 @@
       ansible.builtin.copy:
         content: |
           # USB Serial devices
+          SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", MODE="0660"
           SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="servo", MODE="0660"
           SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="lidar"
 

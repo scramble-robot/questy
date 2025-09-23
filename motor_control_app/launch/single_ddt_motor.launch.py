@@ -23,13 +23,13 @@ def generate_launch_description():
         
         DeclareLaunchArgument(
             'max_motor_rpm',
-            default_value='100',
+            default_value='30',
             description='Maximum motor RPM'
         ),
         
         DeclareLaunchArgument(
             'velocity_scale_factor',
-            default_value='60.0',
+            default_value='5.0',
             description='Scale factor to convert linear velocity (m/s) to RPM'
         ),
 
@@ -44,7 +44,7 @@ def generate_launch_description():
                 'motor_id': LaunchConfiguration('motor_id'),
                 'max_motor_rpm': LaunchConfiguration('max_motor_rpm'),
                 'velocity_scale_factor': LaunchConfiguration('velocity_scale_factor'),
-                'baud_rate': 56700,
+                'baud_rate': 57600,
                 'wheel_radius': 0.1,
                 'status_publish_rate': 5.0,
                 'watchdog_timeout': 1.0

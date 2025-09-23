@@ -12,18 +12,19 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
       last_pan_value_(0.0),
       current_pan_position_(2048) {
   // パラメーター宣言
-  this->declare_parameter("port", "/dev/ttyUSB0");
+  this->declare_parameter("port", "/dev/servo");
   this->declare_parameter("baudrate", 115200);
   this->declare_parameter("pan_servo_id", 1);
   this->declare_parameter("trigger_servo_id", 3);
-  this->declare_parameter("fire_button", 0);         // 射撃ボタン（Aボタンなど）
-  this->declare_parameter("pan_axis", 7);            // パン軸（十字キー上下など）
-  this->declare_parameter("pan_step_angle", 5.0);    // パンステップサイズ（度）
-  this->declare_parameter("pan_min_angle", 0.0);     // パン最小角度（度）
-  this->declare_parameter("pan_max_angle", 360.0);   // パン最大角度（度）
-  this->declare_parameter("fire_angle", 130.0);      // 射撃角度（度）
-  this->declare_parameter("home_angle", 180.0);      // ホーム角度（度）
-  this->declare_parameter("fire_duration_ms", 300);  // 射撃持続時間（ミリ秒）
+  this->declare_parameter("fire_button", 0);             // 射撃ボタン（Aボタンなど）
+  this->declare_parameter("pan_axis", 7);                // パン軸（十字キー上下など）
+  this->declare_parameter("pan_step_angle", 5.0);        // パンステップサイズ（度）
+  this->declare_parameter("pan_min_angle", 0.0);         // パン最小角度（度）
+  this->declare_parameter("pan_max_angle", 70.0);       // パン最大角度（度）
+  this->declare_parameter("fire_angle", 130.0);          // 射撃角度（度）
+  this->declare_parameter("home_angle", 100.0);          // ホーム角度（度）
+  this->declare_parameter("fire_duration_ms", 300);      // 射撃持続時間（ミリ秒）
+  this->declare_parameter("command_rate_limit_ms", 50);  // コマンド間隔制限（ミリ秒）
 
   // パラメーター取得
   std::string port = this->get_parameter("port").as_string();
@@ -38,6 +39,10 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
   fire_angle_ = this->get_parameter("fire_angle").as_double();
   home_angle_ = this->get_parameter("home_angle").as_double();
   fire_duration_ms_ = this->get_parameter("fire_duration_ms").as_int();
+  command_rate_limit_ms_ = this->get_parameter("command_rate_limit_ms").as_int();
+
+  // 最後のコマンド時刻を初期化
+  last_command_time_ = this->now();
 
   // サーボコントローラー初期化
   servo_controller_ = std::make_shared<motor_control_lib::FeetechServoController>(port, baudrate);
@@ -131,24 +136,34 @@ void ShotComponent::joyCallback(const sensor_msgs::msg::Joy::SharedPtr msg) {
 
     // 軸の値が+1.0になった瞬間を検出（パン上）
     if (current_pan_value > 0.5 && last_pan_value_ <= 0.5) {
-      double new_angle = current_pan_angle_ + pan_step_angle_;
-      current_pan_angle_ = clampAngle(new_angle);
-      current_pan_position_ = angleToServoPosition(current_pan_angle_);
-      if (servo_controller_->setPosition(pan_servo_id_, current_pan_position_, false)) {
-        RCLCPP_INFO(this->get_logger(), "Pan up: angle=%.1f deg", current_pan_angle_);
+      if (canSendCommand()) {
+        double new_angle = current_pan_angle_ + pan_step_angle_;
+        current_pan_angle_ = clampAngle(new_angle);
+        current_pan_position_ = angleToServoPosition(current_pan_angle_);
+        if (servo_controller_->setPosition(pan_servo_id_, current_pan_position_, false)) {
+          RCLCPP_INFO(this->get_logger(), "Pan up: angle=%.1f deg", current_pan_angle_);
+          last_command_time_ = this->now();
+        } else {
+          RCLCPP_ERROR(this->get_logger(), "Failed to move pan up");
+        }
       } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to move pan up");
+        RCLCPP_DEBUG(this->get_logger(), "Pan command rate limited");
       }
     }
     // 軸の値が-1.0になった瞬間を検出（パン下）
     else if (current_pan_value < -0.5 && last_pan_value_ >= -0.5) {
-      double new_angle = current_pan_angle_ - pan_step_angle_;
-      current_pan_angle_ = clampAngle(new_angle);
-      current_pan_position_ = angleToServoPosition(current_pan_angle_);
-      if (servo_controller_->setPosition(pan_servo_id_, current_pan_position_, false)) {
-        RCLCPP_INFO(this->get_logger(), "Pan down: angle=%.1f deg", current_pan_angle_);
+      if (canSendCommand()) {
+        double new_angle = current_pan_angle_ - pan_step_angle_;
+        current_pan_angle_ = clampAngle(new_angle);
+        current_pan_position_ = angleToServoPosition(current_pan_angle_);
+        if (servo_controller_->setPosition(pan_servo_id_, current_pan_position_, false)) {
+          RCLCPP_INFO(this->get_logger(), "Pan down: angle=%.1f deg", current_pan_angle_);
+          last_command_time_ = this->now();
+        } else {
+          RCLCPP_ERROR(this->get_logger(), "Failed to move pan down");
+        }
       } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to move pan down");
+        RCLCPP_DEBUG(this->get_logger(), "Pan command rate limited");
       }
     }
 
@@ -232,24 +247,33 @@ double ShotComponent::clampAngle(double angle_deg) {
   return std::max(pan_min_angle_, std::min(pan_max_angle_, angle_deg));
 }
 
-// 角度からサーボ位置への変換（制限範囲 -> 0-4095）
-int ShotComponent::angleToServoPosition(double angle_deg) {
-  // 角度を制限範囲にクランプ
-  angle_deg = clampAngle(angle_deg);
-  // サーボ位置に変換（制限範囲をサーボの全範囲にマッピング）
-  double range = pan_max_angle_ - pan_min_angle_;
-  double normalized = (angle_deg - pan_min_angle_) / range;
-  return static_cast<int>(normalized * 4096.0);
+// コマンド送信レート制限チェック
+bool ShotComponent::canSendCommand() {
+  auto now = this->now();
+  auto elapsed = (now - last_command_time_).nanoseconds() / 1000000;  // ミリ秒に変換
+  return elapsed >= command_rate_limit_ms_;
 }
 
-// サーボ位置から角度への変換（0-4095 -> 制限範囲）
+// 角度からサーボ位置への変換（角度 -> 0-4095）
+int ShotComponent::angleToServoPosition(double angle_deg) {
+  // 角度を直接サーボ位置に変換（0度=0, 360度=4095）
+  // 角度を0-360度の範囲で正規化
+  while (angle_deg < 0) angle_deg += 360.0;
+  while (angle_deg >= 360.0) angle_deg -= 360.0;
+  
+  // サーボ位置に変換
+  double normalized = angle_deg / 360.0;
+  int position = static_cast<int>(normalized * 4096.0);
+  return std::max(0, std::min(4095, position));
+}
+
+// サーボ位置から角度への変換（0-4095 -> 角度）
 double ShotComponent::servoPositionToAngle(int position) {
   // 位置を0-4095の範囲にクランプ
   position = std::max(0, std::min(4095, position));
-  // 角度に変換（サーボの全範囲を制限範囲にマッピング）
+  // 角度に変換（0-4095 -> 0-360度）
   double normalized = static_cast<double>(position) / 4096.0;
-  double range = pan_max_angle_ - pan_min_angle_;
-  return pan_min_angle_ + (normalized * range);
+  return normalized * 360.0;
 }
 
 }  // namespace motor_control_app

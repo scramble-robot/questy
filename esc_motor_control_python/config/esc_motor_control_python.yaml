@@ -4,9 +4,9 @@ esc_motor_control_python:
     pwm_pin: 13 # GPIO pin for PWM output
 
     # ESC pulse width settings (in milliseconds)
-    min_pulse_width: 1.0 # Minimum pulse width (typically 1.0ms for ESC)
-    max_pulse_width: 2.0 # Maximum pulse width (typically 2.0ms for ESC)
-    neutral_pulse_width: 1.5 # Neutral position (typically 1.5ms for ESC)
+    # min_pulse_width: 0.0 # Minimum pulse width (typically 1.0ms for ESC)
+    # max_pulse_width: 2.0 # Maximum pulse width (typically 2.0ms for ESC)
+    neutral_pulse_width: 1.0 # Neutral position (typically 1.5ms for ESC)
 
     # Motor speed limits
     max_speed: 1.0 # Maximum forward speed (-1.0 to 1.0)

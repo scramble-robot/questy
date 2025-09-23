@@ -70,6 +70,37 @@ ament_target_dependencies(drive_component
 # Register the component
 rclcpp_components_register_nodes(drive_component "motor_control_app::DriveComponent")
 
+# Single DDT Motor Component (as a shared library for component loading)
+add_library(single_ddt_motor_component SHARED
+  src/single_ddt_motor_component.cpp
+)
+target_include_directories(single_ddt_motor_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(single_ddt_motor_component
+  rclcpp
+  rclcpp_components
+  std_msgs
+  geometry_msgs
+  motor_control_lib
+)
+
+# Register the single DDT motor component
+rclcpp_components_register_nodes(single_ddt_motor_component "motor_control_app::SingleDdtMotorComponent")
+
+# Single DDT Motor Component Node (standalone executable)
+add_executable(single_ddt_motor_node src/single_ddt_motor_node.cpp)
+target_include_directories(single_ddt_motor_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(single_ddt_motor_node single_ddt_motor_component)
+ament_target_dependencies(single_ddt_motor_node
+  rclcpp
+  motor_control_lib
+)
+
 # Drive Component Node (standalone executable)
 add_executable(drive_component_node src/drive_component_node.cpp)
 target_include_directories(drive_component_node PUBLIC
@@ -141,11 +172,11 @@ ament_target_dependencies(shot_component_node
 )
 
 # Install executables and libraries
-install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node
+install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node single_ddt_motor_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS drive_component shot_component
+install(TARGETS drive_component shot_component single_ddt_motor_component
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

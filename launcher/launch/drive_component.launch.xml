@@ -6,14 +6,18 @@ DDT Motor Controller単体起動用ランチファイル
   <!-- Launch Arguments -->
   <arg name="use_sim_time" default="false" description="Use simulation time" />
   <arg name="joy_device" default="/dev/input/js0" description="Joystick device path" />
+  <arg name="joy_config_file" default="$(find-pkg-share joy_controller)/config/joy_controller_params.yaml" description="Configuration file path" />
+  <arg name="drive_config_file" default="$(find-pkg-share motor_control_app)/config/drive_component.yaml" description="Configuration file path" />
 
   <!-- Joy Controller component launch -->
   <include file="$(find-pkg-share joy_controller)/launch/joy_controller.launch.xml">
     <arg name="use_sim_time" value="$(var use_sim_time)" />
     <arg name="joy_device" value="$(var joy_device)" />
+    <arg name="config_file" value="$(var joy_config_file)" />
   </include>
   <!-- Include drive Component Launch -->
   <include file="$(find-pkg-share motor_control_app)/launch/drive_component.launch.py">
     <arg name="use_sim_time" value="$(var use_sim_time)" />
+    <arg name="config_file" value="$(var drive_config_file)" />
   </include>
 </launch>

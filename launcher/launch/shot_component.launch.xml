@@ -1,9 +1,13 @@
 <launch>
   <!-- Launch Arguments -->
 
+  <arg name="shot_config_file" default="$(find-pkg-share motor_control_app)/config/shot_component.yaml" description="Configuration file path" />
+  <arg name="esc_motor_config_file" default="$(find-pkg-share esc_motor_control_python)/config/esc_motor_control_params.yaml" description="Configuration file path" />
+  <arg name="use_sim_time" default="false" description="Use simulation time" />
   <!-- shot component launch -->
-  <include file="$(find-pkg-share motor_control_app)/launch/shot_component.launch.py"/>
-
+  <include file="$(find-pkg-share motor_control_app)/launch/shot_component.launch.py">
+    <arg name="config_file" value="$(var shot_config_file)"/>
+  </include>
   <!-- Include esc_motor_control_python Component Launch -->
   <include file="$(find-pkg-share esc_motor_control_python)/launch/esc_motor_control_python.launch.xml"/>
 </launch>

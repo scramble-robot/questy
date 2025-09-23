@@ -13,11 +13,6 @@ def generate_launch_description():
     config_file = os.path.join(pkg_dir, 'config', 'shot_config.yaml')
     
     # Launch引数
-    port_arg = DeclareLaunchArgument(
-        'port',
-        default_value='/dev/ttyUSB0',
-        description='Serial port for servo communication'
-    )
     
     
     fire_button_arg = DeclareLaunchArgument(
@@ -35,7 +30,6 @@ def generate_launch_description():
         parameters=[
             config_file,
             {
-                'port': LaunchConfiguration('port'),
                 'fire_button': LaunchConfiguration('fire_button')
             }
         ],
@@ -43,7 +37,6 @@ def generate_launch_description():
     )
     
     return LaunchDescription([
-        port_arg,
         fire_button_arg,
         shot_component_node
     ])

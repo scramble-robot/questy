@@ -159,11 +159,8 @@
       ansible.builtin.copy:
         content: |
           # USB Serial devices
-          SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="robot_serial"
-
-          # Arduino devices
-          SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0043", SYMLINK+="arduino_uno"
-          SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="8036", SYMLINK+="arduino_leonardo"
+          SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="servo", MODE="0660"
+          SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="lidar"
 
           # Common USB camera
           SUBSYSTEM=="video4linux", KERNEL=="video[0-9]*", ATTRS{product}=="USB Camera", SYMLINK+="robot_camera"

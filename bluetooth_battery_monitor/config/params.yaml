@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    # UPower device path for the Bluetooth device
+    # You can find available devices with: upower -e
+    # Example paths:
+    #   - /org/freedesktop/UPower/devices/headset_dev_XX_XX_XX_XX_XX_XX
+    #   - /org/freedesktop/UPower/devices/mouse_dev_YY_YY_YY_YY_YY_YY
+    device_path: "/org/freedesktop/UPower/devices/battery_ps_controller_battery_50oeeo32oc9oacoff"
+
+    # Update rate in seconds (how often to check battery status)
+    # Lower values = more frequent updates but higher CPU usage
+    # Recommended: 30-60 seconds for low overhead
+    update_rate: 30.0
+
+    # Battery warning thresholds (in percentage)
+    low_battery_threshold: 20.0 # WARN level
+    critical_battery_threshold: 10.0 # ERROR level

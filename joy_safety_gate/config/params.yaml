@@ -1,0 +1,27 @@
+# Joy Safety Gate Configuration
+
+joy_safety_gate:
+  ros__parameters:
+    # Timeout for diagnostics messages (seconds)
+    # If no diagnostics received within this time, mark as unsafe
+    diagnostics_timeout: 5.0
+
+    # List of diagnostic names to monitor
+    # If empty, all diagnostics are monitored
+    # Example: ["bluetooth_battery_monitor"]
+    monitor_names: []
+
+    # Diagnostic levels that trigger blocking
+    # Valid levels: OK, WARN, ERROR, STALE
+    # Joy messages are blocked when any monitored diagnostic has one of these levels
+    block_levels: ["ERROR"]
+
+    # Require diagnostics before allowing Joy messages
+    # If true, blocks messages until first diagnostics message is received
+    require_diagnostics: true
+
+    # Pass through Joy messages even when unsafe
+    # If true, always pass through Joy messages (only log warnings)
+    # If false, block Joy messages when unsafe
+    # Recommended: false for safety-critical applications
+    pass_through_when_unsafe: false

@@ -101,6 +101,38 @@ ament_target_dependencies(single_ddt_motor_node
   motor_control_lib
 )
 
+# Joy Axis Drive Component (as a shared library for component loading)
+add_library(joy_axis_drive_component SHARED
+  src/joy_axis_drive_component.cpp
+)
+target_include_directories(joy_axis_drive_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(joy_axis_drive_component
+  rclcpp
+  rclcpp_components
+  std_msgs
+  geometry_msgs
+  sensor_msgs
+  motor_control_lib
+)
+
+# Register the joy axis drive component
+rclcpp_components_register_nodes(joy_axis_drive_component "motor_control_app::JoyAxisDriveComponent")
+
+# Joy Axis Drive Component Node (standalone executable)
+add_executable(joy_axis_drive_node src/joy_axis_drive_node.cpp)
+target_include_directories(joy_axis_drive_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(joy_axis_drive_node joy_axis_drive_component)
+ament_target_dependencies(joy_axis_drive_node
+  rclcpp
+  motor_control_lib
+)
+
 # Drive Component Node (standalone executable)
 add_executable(drive_component_node src/drive_component_node.cpp)
 target_include_directories(drive_component_node PUBLIC
@@ -172,11 +204,11 @@ ament_target_dependencies(shot_component_node
 )
 
 # Install executables and libraries
-install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node single_ddt_motor_node
+install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node single_ddt_motor_node joy_axis_drive_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS drive_component shot_component single_ddt_motor_component
+install(TARGETS drive_component shot_component single_ddt_motor_component joy_axis_drive_component
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib

@@ -1,0 +1,25 @@
+# Diagnostic Safety Gate Configuration
+
+diagnostic_safety_gate:
+  ros__parameters:
+    # Timeout for diagnostics messages (seconds)
+    # If no diagnostics received within this time, block commands
+    diagnostics_timeout: 5.0
+
+    # Timeout for cmd_vel input messages (seconds)
+    # If no cmd_vel received within this time, output zero velocity
+    cmd_vel_timeout: 0.5
+
+    # List of diagnostic names to monitor
+    # If empty, all diagnostics are monitored
+    # Example: ["battery_monitor", "motor_controller"]
+    monitor_names: []
+
+    # Diagnostic levels that trigger command blocking
+    # Valid levels: OK, WARN, ERROR, STALE
+    # Commands are blocked when any monitored diagnostic has one of these levels
+    block_levels: ["ERROR"]
+
+    # Require diagnostics before allowing commands
+    # If true, blocks commands until first diagnostics message is received
+    require_diagnostics: true

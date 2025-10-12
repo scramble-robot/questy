@@ -127,7 +127,7 @@
     - name: Add user to gpio group
       ansible.builtin.user:
         name: "{{ ansible_user | default(ansible_env.USER) }}"
-        groups: gpio
+        groups: gpio,input,dialout
         append: true
 
     - name: Create robotics workspace directory
@@ -152,7 +152,7 @@
         - "export ROBOT_WS=/home/{{ ansible_user | default(ansible_env.SUDO_USER) }}/robot_ws"
         - "alias rw='cd $ROBOT_WS'"
         - "alias rs='cd $ROBOT_WS/src'"
-        - "alias rb='cd $ROBOT_WS && colcon build'"
+        - "alias rb='cd $ROBOT_WS && colcon build --symlink-install'"
         - "alias rt='cd $ROBOT_WS && colcon test'"
         - "alias gpio_status='raspi-gpio get'"
 

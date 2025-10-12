@@ -1,0 +1,15 @@
+---
+# ROS2 Build Tasks - Build workspace with colcon
+
+- name: Build ROS2 workspace with symlink install
+  ansible.builtin.shell: |
+    cd {{ workspace_path | default('/home/' + (ansible_user | default(ansible_env.SUDO_USER)) + '/robot_ws') }}
+    source /opt/ros/{{ ros2_distro | default('jazzy') }}/setup.bash
+    colcon build --symlink-install
+  become: false
+  register: colcon_build_result
+  changed_when: true
+
+- name: Display colcon build result
+  ansible.builtin.debug:
+    msg: "Colcon build completed: {{ colcon_build_result.stdout_lines[-5:] if colcon_build_result.stdout_lines else 'No output' }}"

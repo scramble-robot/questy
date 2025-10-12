@@ -1,0 +1,27 @@
+joy_axis_drive:
+  ros__parameters:
+    # シリアル通信設定
+    serial_port: "/dev/ttyACM0"
+    baud_rate: 57600
+
+    # モータ設定
+    left_motor_id: 4 # 左モータID
+    right_motor_id: 5 # 右モータID
+    max_motor_rpm: 1000 # 最大RPM
+
+    # Joyコントローラーのaxis設定
+    # 注: 一般的なゲームコントローラー:
+    #   - 左スティック縦: axis 1
+    #   - 右スティック縦: axis 4 (または 3)
+    #   - PS4/PS5コントローラーの場合、axis配置が異なる場合があります
+    left_axis_index: 1 # 左モータを制御するaxis番号 (左スティック縦)
+    right_axis_index: 4 # 右モータを制御するaxis番号 (右スティック縦)
+
+    # axis反転フラグ
+    # 前進方向が逆の場合はtrueに設定
+    invert_left_axis: false
+    invert_right_axis: false
+
+    # パブリッシュ設定
+    status_publish_rate: 10.0 # ステータスパブリッシュ頻度 [Hz]
+    publish_twist: true # デバッグ用Twistメッセージをパブリッシュするか

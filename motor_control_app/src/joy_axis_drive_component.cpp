@@ -26,6 +26,10 @@ JoyAxisDriveComponent::JoyAxisDriveComponent(const rclcpp::NodeOptions& options)
 
   status_publisher_ = this->create_publisher<std_msgs::msg::String>("motor_status", 10);
 
+  // モータRPMパブリッシャー
+  left_rpm_publisher_ = this->create_publisher<std_msgs::msg::Int32>("left_motor_rpm", 10);
+  right_rpm_publisher_ = this->create_publisher<std_msgs::msg::Int32>("right_motor_rpm", 10);
+
   // デバッグ用Twistパブリッシャー(オプション)
   if (publish_twist_) {
     twist_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("current_twist", 10);
@@ -38,6 +42,7 @@ JoyAxisDriveComponent::JoyAxisDriveComponent(const rclcpp::NodeOptions& options)
                               std::bind(&JoyAxisDriveComponent::statusTimerCallback, this));
 
   RCLCPP_INFO(this->get_logger(), "Joy Axis Drive Component initialized successfully");
+  RCLCPP_INFO(this->get_logger(), "Publishing motor RPM on topics: /left_motor_rpm, /right_motor_rpm");
 }
 
 JoyAxisDriveComponent::~JoyAxisDriveComponent() {
@@ -253,6 +258,14 @@ void JoyAxisDriveComponent::statusTimerCallback() {
     auto status_msg = std_msgs::msg::String();
     status_msg.data = status_str;
     status_publisher_->publish(status_msg);
+
+    // 左右のモータRPMを個別にパブリッシュ
+    auto left_rpm_msg = std_msgs::msg::Int32();
+    auto right_rpm_msg = std_msgs::msg::Int32();
+    left_rpm_msg.data = left_rpm;
+    right_rpm_msg.data = right_rpm;
+    left_rpm_publisher_->publish(left_rpm_msg);
+    right_rpm_publisher_->publish(right_rpm_msg);
 
     RCLCPP_DEBUG(this->get_logger(), "Motor status: left_rpm=%d, right_rpm=%d", left_rpm,
                  right_rpm);

@@ -9,6 +9,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 #include "sensor_msgs/msg/joy.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace motor_control_app {
@@ -70,6 +71,8 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr status_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twist_publisher_;  // デバッグ用
+  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr left_rpm_publisher_;    // 左モータRPM
+  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr right_rpm_publisher_;   // 右モータRPM
 
   // タイマー
   rclcpp::TimerBase::SharedPtr status_timer_;

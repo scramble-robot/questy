@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch arguments -->
+  <arg name="serial_port" 
+       default="/dev/ttyACM0" 
+       description="Serial port for DDT motor communication" />
+  <arg name="motor_id" 
+       default="1" 
+       description="DDT motor ID" />
+
+  <!-- Single DDT Motor Component Node -->
+  <node pkg="motor_control_app" 
+        exec="single_ddt_motor_node" 
+        name="single_ddt_motor_node" 
+        output="screen">
+    <param name="serial_port" value="$(var serial_port)" />
+    <param name="motor_id" value="$(var motor_id)" />
+    <param name="max_motor_rpm" value="100" />
+    <param name="velocity_scale_factor" value="60.0" />
+    <param name="baud_rate" value="115200" />
+    <param name="wheel_radius" value="0.1" />
+    <param name="status_publish_rate" value="5.0" />
+    <param name="watchdog_timeout" value="1.0" />
+    <remap from="cmd_vel" to="/cmd_vel" />
+    <remap from="motor_status" to="/motor_status" />
+  </node>
+
+  <!-- Test publisher node (sends twist messages for testing) -->
+  <!-- Note: XML launch files do not support TimerAction, this node starts immediately -->
+  <node pkg="motor_control_app" 
+        exec="simple_motor_app" 
+        name="twist_test_publisher" 
+        output="screen">
+    <param name="publish_rate" value="2.0" />
+    <param name="test_sequence" value="true" />
+    <remap from="cmd_vel" to="/cmd_vel" />
+  </node>
+</launch>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch arguments -->
+  <arg name="fire_button" 
+       default="0" 
+       description="Fire button number" />
+
+  <!-- Shot Component Node -->
+  <node pkg="motor_control_app" 
+        exec="shot_component_node" 
+        name="shot_component" 
+        output="screen">
+    <param from="$(find-pkg-share motor_control_app)/config/shot_config.yaml" />
+    <param name="fire_button" value="$(var fire_button)" />
+  </node>
+</launch>

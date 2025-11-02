@@ -18,12 +18,28 @@ Joy Controller launch file
         <param name="use_sim_time" value="$(var use_sim_time)" />
     </node>
 
+    <!-- Joy Gate node -->
+    <node pkg="joy_gate" exec="joy_gate_node" name="joy_gate" output="screen">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
     <!-- Joy controller node -->
     <node pkg="joy_controller" exec="joy_controller_node" name="joy_controller" output="screen">
         <param name="use_sim_time" value="$(var use_sim_time)" />
         <param name="debug_mode" value="$(var debug_mode)" />
         <!-- Load parameters from YAML file -->
         <param from="$(var config_file)" />
-    </node
+    </node>
+
+    <!-- GPIO Reader Node -->
+    <node pkg="gpio_reader" exec="gpio_reader_node" name="gpio_reader_node" output="screen">
+        <param from="$(find-pkg-share gpio_reader)/config/gpio_reader.yaml" />
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <!-- Operation Manager Node -->
+    <node pkg="operation_manager" exec="operation_manager_node" name="operation_manager_node" output="screen">
+        <param from="$(find-pkg-share operation_manager)/config/operation_manager.yaml" />
+    </node>
 
 </launch>

@@ -6,14 +6,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(motor_control_lib REQUIRED)
-find_package(joy REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+find_package(motor_control_lib REQUIRED)  # Manual find for local library
+ament_auto_find_build_dependencies()
 
 # Unified motor control node (コメントアウト)
 # add_executable(unified_motor_control_node src/unified_motor_control_node.cpp)
@@ -145,18 +140,6 @@ ament_target_dependencies(drive_component_node
   motor_control_lib
 )
 
-# Individual Motor App (for testing individual motor control)
-add_executable(individual_motor_app src/individual_motor_app.cpp)
-target_include_directories(individual_motor_app PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(individual_motor_app
-  rclcpp
-  std_msgs
-  motor_control_lib
-)
-
 # Unified Motor App (using MotorManager)
 add_executable(unified_motor_app src/unified_motor_app.cpp)
 target_include_directories(unified_motor_app PUBLIC
@@ -204,7 +187,7 @@ ament_target_dependencies(shot_component_node
 )
 
 # Install executables and libraries
-install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node single_ddt_motor_node joy_axis_drive_node
+install(TARGETS simple_test_node simple_motor_app drive_component_node unified_motor_app shot_component_node single_ddt_motor_node joy_axis_drive_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

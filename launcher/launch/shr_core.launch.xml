@@ -15,7 +15,7 @@
     <include file="$(find-pkg-share shr_launcher)/launch/drive_component.launch.xml"/>
   </group>
   <group if="$(var enable_lidar)">
-    <include file="$(find-pkg-share ydlidar_ros2_driver)/launch/ydlidar_launch.py"/>
+    <include file="$(find-pkg-share ydlidar_ros2_driver)/launch/ydlidar_launch.xml"/>
   </group>
   <!-- RViz Visualization -->
   <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" if="$(var enable_rviz)" args="-d $(find-pkg-share ydlidar_ros2_driver)/config/ydlidar.rviz">

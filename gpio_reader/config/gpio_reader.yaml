@@ -4,7 +4,7 @@
     chip_name: "/dev/gpiochip4"
 
     # GPIO pins to monitor (BCM numbering)
-    gpio_pins: [17, 27, 22, 23, 24]
+    gpio_pins: [27]
 
     # Publishing rate in Hz
-    publish_rate: 10.0
+    publish_rate: 20.0

@@ -1,0 +1,12 @@
+/**:
+  ros__parameters:
+    # Topic names
+    gpio_controllable_topic: "/gpio/controllable"
+    joy_input_topic: "/joy"
+    joy_output_topic: "/joy_gated"
+
+    # QoS settings
+    qos_depth: 10
+
+    # Logging
+    use_sim_time: false

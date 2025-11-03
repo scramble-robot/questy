@@ -28,20 +28,9 @@ ament_auto_add_executable(joy_controller_node
 
 target_link_libraries(joy_controller_node joy_controller_component)
 
-# Install launch and config files
-install(DIRECTORY
-  launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
-
-install(DIRECTORY
-  config/
-  DESTINATION share/${PROJECT_NAME}/config
-)
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_auto_package()
+ament_auto_package(INSTALL_TO_SHARE launch config)

@@ -8,13 +8,27 @@ DDT Motor Controller単体起動用ランチファイル
   <arg name="joy_device" default="/dev/input/js0" description="Joystick device path" />
   <arg name="joy_config_file" default="$(find-pkg-share joy_controller)/config/joy_controller_params.yaml" description="Configuration file path" />
   <arg name="drive_config_file" default="$(find-pkg-share motor_control_app)/config/drive_component.yaml" description="Configuration file path" />
+  <arg name="enable_gpio_ref" default="false" description="Enable GPIO reference system (gpio_reader + joy_gate)" />
+  <arg name="gpio_config_file" default="$(find-pkg-share gpio_reader)/config/gpio_reader.yaml" description="GPIO reader configuration file path" />
 
-  <!-- Joy Controller component launch -->
-  <include file="$(find-pkg-share joy_controller)/launch/joy_controller.launch.xml">
-    <arg name="use_sim_time" value="$(var use_sim_time)" />
-    <arg name="joy_device" value="$(var joy_device)" />
-    <arg name="config_file" value="$(var joy_config_file)" />
-  </include>
+  <!-- Joy Controller component launch (without GPIO ref) -->
+  <group unless="$(var enable_gpio_ref)">
+    <include file="$(find-pkg-share joy_controller)/launch/joy_controller.launch.xml">
+      <arg name="use_sim_time" value="$(var use_sim_time)" />
+      <arg name="joy_device" value="$(var joy_device)" />
+      <arg name="config_file" value="$(var joy_config_file)" />
+    </include>
+  </group>
+
+  <!-- Joy Controller with GPIO reference system (gpio_reader + joy_gate + operation_manager) -->
+  <group if="$(var enable_gpio_ref)">
+    <include file="$(find-pkg-share joy_controller)/launch/joy_controller_referee.launch.xml">
+      <arg name="use_sim_time" value="$(var use_sim_time)" />
+      <arg name="joy_device" value="$(var joy_device)" />
+      <arg name="config_file" value="$(var joy_config_file)" />
+    </include>
+  </group>
+
   <!-- Include drive Component Launch -->
   <include file="$(find-pkg-share motor_control_app)/launch/drive_component.launch.py">
     <arg name="use_sim_time" value="$(var use_sim_time)" />

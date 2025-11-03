@@ -8,6 +8,7 @@ Joy Controller launch file
     <arg name="config_file" default="$(find-pkg-share joy_controller)/config/joy_controller_params.yaml" description="Path to the joy controller configuration file" />
     <arg name="use_sim_time" default="false" description="Use simulation time" />
     <arg name="joy_device" default="/dev/input/js0" description="Joystick device path" />
+    <arg name="joy_topic" default="/joy" description="Joy input topic (can be /joy or /joy_gated)" />
     <arg name="debug_mode" default="false" description="Enable debug mode" />
 
     <!-- Joy node (from joy package) -->
@@ -22,8 +23,9 @@ Joy Controller launch file
     <node pkg="joy_controller" exec="joy_controller_node" name="joy_controller" output="screen">
         <param name="use_sim_time" value="$(var use_sim_time)" />
         <param name="debug_mode" value="$(var debug_mode)" />
+        <param name="joy_topic" value="$(var joy_topic)" />
         <!-- Load parameters from YAML file -->
         <param from="$(var config_file)" />
-    </node
+    </node>
 
 </launch>

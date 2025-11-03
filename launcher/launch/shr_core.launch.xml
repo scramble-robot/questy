@@ -5,6 +5,7 @@
   <arg name="enable_lidar" default="true" description="Enable YDLiDAR" />
   <arg name="enable_shot" default="true" description="Enable Shot component"/>
   <arg name="enable_drive" default="true" description="Enable drive component"/>
+  <arg name="enable_gpio_ref" default="false" description="Enable GPIO reference system (gpio_reader + joy_gate)"/>
   <arg name="enable_rviz" default="false" description="Enable RViz visualization" />
 
   <group if="$(var enable_shot)">
@@ -12,10 +13,12 @@
   </group>
 
   <group if="$(var enable_drive)">
-    <include file="$(find-pkg-share shr_launcher)/launch/drive_component.launch.xml"/>
+    <include file="$(find-pkg-share shr_launcher)/launch/drive_component.launch.xml">
+      <arg name="enable_gpio_ref" value="$(var enable_gpio_ref)"/>
+    </include>
   </group>
   <group if="$(var enable_lidar)">
-    <include file="$(find-pkg-share ydlidar_ros2_driver)/launch/ydlidar_launch.xml"/>
+    <include file="$(find-pkg-share ydlidar_ros2_driver)/launch/ydlidar_launch.py"/>
   </group>
   <!-- RViz Visualization -->
   <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" if="$(var enable_rviz)" args="-d $(find-pkg-share ydlidar_ros2_driver)/config/ydlidar.rviz">

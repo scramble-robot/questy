@@ -29,13 +29,18 @@ JoyControllerComponent::JoyControllerComponent(const rclcpp::NodeOptions &option
   // Load parameters
   loadParameters();
 
+  // Get joy input topic name (default: /joy, can be remapped to /joy_gated)
+  declare_parameter("joy_topic", "/joy");
+  std::string joy_topic = get_parameter("joy_topic").as_string();
+
   // Initialize ROS2 interfaces
   joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
-      "/joy", 10, std::bind(&JoyControllerComponent::joyCallback, this, std::placeholders::_1));
+      joy_topic, 10, std::bind(&JoyControllerComponent::joyCallback, this, std::placeholders::_1));
 
   twist_pub_ = this->create_publisher<geometry_msgs::msg::Twist>("/target_twist", 1);
 
   RCLCPP_INFO(this->get_logger(), "Joy Controller Component initialized");
+  RCLCPP_INFO(this->get_logger(), "Subscribing to joy topic: %s", joy_topic.c_str());
   if (debug_mode_) {
     RCLCPP_INFO(this->get_logger(), "Debug mode enabled");
   }

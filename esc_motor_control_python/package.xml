@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
     <name>esc_motor_control_python</name>
-    <version>0.1.0</version>
+    <version>0.0.0</version>
     <description>Python ROS2 package for controlling brushed motors via ESC using PWM on Raspberry Pi</description>
     <maintainer email="aki.grade2580@outlook.jp">asa-naki</maintainer>
     <license>MIT</license>

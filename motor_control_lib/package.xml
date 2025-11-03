@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
     <name>motor_control_lib</name>
-    <version>0.0.1</version>
+    <version>0.0.0</version>
     <description>Motor control library with common interfaces for drive and shot functionality</description>
-    <maintainer email="your-email@example.com">Your Name</maintainer>
+    <maintainer email="aki.grade2580@outlook.jp">asa-naki</maintainer>
     <license>MIT</license>
 
     <buildtool_depend>ament_cmake_auto</buildtool_depend>

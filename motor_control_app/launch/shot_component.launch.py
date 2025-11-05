@@ -21,6 +21,11 @@ def generate_launch_description():
         description='Fire button number'
     )
     
+    joy_topic_arg = DeclareLaunchArgument(
+        'joy_topic',
+        default_value='/joy',
+        description='Joy topic name'
+    )
     
     # shot componentノード
     shot_component_node = Node(
@@ -30,7 +35,8 @@ def generate_launch_description():
         parameters=[
             config_file,
             {
-                'fire_button': LaunchConfiguration('fire_button')
+                'fire_button': LaunchConfiguration('fire_button'),
+                'joy_topic': LaunchConfiguration('joy_topic')
             }
         ],
         output='screen'
@@ -38,5 +44,6 @@ def generate_launch_description():
     
     return LaunchDescription([
         fire_button_arg,
+        joy_topic_arg,
         shot_component_node
     ])

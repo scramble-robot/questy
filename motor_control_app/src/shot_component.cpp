@@ -25,6 +25,7 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
   this->declare_parameter("home_angle", 100.0);          // ホーム角度（度）
   this->declare_parameter("fire_duration_ms", 300);      // 射撃持続時間（ミリ秒）
   this->declare_parameter("command_rate_limit_ms", 50);  // コマンド間隔制限（ミリ秒）
+  this->declare_parameter("joy_topic", "/joy");           // joyトピック名
 
   // パラメーター取得
   std::string port = this->get_parameter("port").as_string();
@@ -40,6 +41,7 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
   home_angle_ = this->get_parameter("home_angle").as_double();
   fire_duration_ms_ = this->get_parameter("fire_duration_ms").as_int();
   command_rate_limit_ms_ = this->get_parameter("command_rate_limit_ms").as_int();
+  std::string joy_topic = this->get_parameter("joy_topic").as_string();
 
   // 最後のコマンド時刻を初期化
   last_command_time_ = this->now();
@@ -56,7 +58,7 @@ ShotComponent::ShotComponent(const rclcpp::NodeOptions& options)
 
   // joyサブスクライバー作成
   joy_subscription_ = this->create_subscription<sensor_msgs::msg::Joy>(
-      "/joy", 1, std::bind(&ShotComponent::joyCallback, this, std::placeholders::_1));
+      joy_topic, 1, std::bind(&ShotComponent::joyCallback, this, std::placeholders::_1));
 
   // 既存のサブスクライバー（互換性のため）
   aim_subscription_ = this->create_subscription<geometry_msgs::msg::Point>(

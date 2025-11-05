@@ -9,7 +9,9 @@
   <arg name="enable_rviz" default="false" description="Enable RViz visualization" />
 
   <group if="$(var enable_shot)">
-    <include file="$(find-pkg-share shr_launcher)/launch/shot_component.launch.xml"/>
+    <include file="$(find-pkg-share shr_launcher)/launch/shot_component.launch.xml">
+      <arg name="enable_gpio_ref" value="$(var enable_gpio_ref)"/>
+    </include>
   </group>
 
   <group if="$(var enable_drive)">

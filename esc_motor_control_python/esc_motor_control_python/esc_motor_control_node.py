@@ -48,7 +48,7 @@ class ESCMotorControlNode(Node):
         self.declare_parameter('full_speed_button', 3)
         self.declare_parameter('full_speed_value', 1.0)
         self.declare_parameter('test_mode', False)
-        self.declare_parameter('joy_topic', 'joy')
+        self.declare_parameter('joy_topic', '/joy')
         self.declare_parameter('cmd_vel_topic', 'cmd_vel')
         self.declare_parameter('min_pulse_width', 0)  # us
         self.declare_parameter('max_pulse_width', 2000)  # us

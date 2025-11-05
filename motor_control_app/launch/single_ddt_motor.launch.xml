@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch arguments -->
+  <arg name="serial_port" 
+       default="/dev/ttyACM0" 
+       description="Serial port for DDT motor communication" />
+  <arg name="motor_id" 
+       default="4" 
+       description="DDT motor ID" />
+  <arg name="max_motor_rpm" 
+       default="30" 
+       description="Maximum motor RPM" />
+  <arg name="velocity_scale_factor" 
+       default="5.0" 
+       description="Scale factor to convert linear velocity (m/s) to RPM" />
+
+  <!-- Single DDT Motor Component Node -->
+  <node pkg="motor_control_app" 
+        exec="single_ddt_motor_node" 
+        name="single_ddt_motor_node" 
+        output="screen">
+    <param name="serial_port" value="$(var serial_port)" />
+    <param name="motor_id" value="$(var motor_id)" />
+    <param name="max_motor_rpm" value="$(var max_motor_rpm)" />
+    <param name="velocity_scale_factor" value="$(var velocity_scale_factor)" />
+    <param name="baud_rate" value="57600" />
+    <param name="wheel_radius" value="0.1" />
+    <param name="status_publish_rate" value="5.0" />
+    <param name="watchdog_timeout" value="1.0" />
+    <remap from="cmd_vel" to="/cmd_vel" />
+    <remap from="motor_status" to="/motor_status" />
+  </node>
+</launch>

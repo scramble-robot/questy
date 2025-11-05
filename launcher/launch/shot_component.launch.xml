@@ -3,11 +3,21 @@
 
   <arg name="shot_config_file" default="$(find-pkg-share motor_control_app)/config/shot_component.yaml" description="Configuration file path" />
   <arg name="esc_motor_config_file" default="$(find-pkg-share esc_motor_control_python)/config/esc_motor_control_params.yaml" description="Configuration file path" />
+  <arg name="enable_gpio_ref" default="false" description="Enable GPIO reference system (gpio_reader + joy_gate)" />
   <arg name="use_sim_time" default="false" description="Use simulation time" />
+  
+  <!-- joy topic selection based on enable_gpio_ref -->
+  <let name="joy_topic_name" value="/joy_gated" if="$(var enable_gpio_ref)" />
+  <let name="joy_topic_name" value="/joy" unless="$(var enable_gpio_ref)" />
+  
   <!-- shot component launch -->
   <include file="$(find-pkg-share motor_control_app)/launch/shot_component.launch.py">
     <arg name="config_file" value="$(var shot_config_file)"/>
+    <arg name="joy_topic" value="$(var joy_topic_name)"/>
   </include>
+  
   <!-- Include esc_motor_control_python Component Launch -->
-  <include file="$(find-pkg-share esc_motor_control_python)/launch/esc_motor_control_python.launch.xml"/>
+  <include file="$(find-pkg-share esc_motor_control_python)/launch/esc_motor_control_python.launch.xml">
+    <arg name="joy_topic" value="$(var joy_topic_name)"/>
+  </include>
 </launch>

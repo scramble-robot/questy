@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    # GPIO chip device path (for Raspberry Pi 5, use /dev/gpiochip4)
+    chip_name: "/dev/gpiochip4"
+
+    # GPIO pins to monitor (BCM numbering)
+    gpio_pins: [27]
+
+    # Publishing rate in Hz
+    publish_rate: 20.0

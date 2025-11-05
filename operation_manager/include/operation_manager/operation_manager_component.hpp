@@ -1,0 +1,37 @@
+#ifndef OPERATION_MANAGER__OPERATION_MANAGER_COMPONENT_HPP_
+#define OPERATION_MANAGER__OPERATION_MANAGER_COMPONENT_HPP_
+
+#include <map>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <string>
+#include <vector>
+
+namespace operation_manager {
+
+class OperationManagerComponent : public rclcpp::Node {
+public:
+  explicit OperationManagerComponent(const rclcpp::NodeOptions& options);
+  virtual ~OperationManagerComponent();
+
+private:
+  void gpio_callback(const std_msgs::msg::Bool::SharedPtr msg, unsigned int pin);
+  void evaluate_controllability();
+
+  std::map<unsigned int, bool> gpio_states_;
+  std::map<unsigned int, rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr> gpio_subs_;
+  std::map<unsigned int, rclcpp::Time> gpio_last_update_;
+
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr controllable_pub_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr diagnostic_pub_;
+
+  rclcpp::TimerBase::SharedPtr eval_timer_;
+
+  double timeout_seconds_;
+  std::vector<int64_t> monitored_pins_;
+};
+
+}  // namespace operation_manager
+
+#endif  // OPERATION_MANAGER__OPERATION_MANAGER_COMPONENT_HPP_

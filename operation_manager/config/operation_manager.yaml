@@ -1,0 +1,4 @@
+operation_manager_node:
+  ros__parameters:
+    monitored_pins: [27]
+    timeout_seconds: 1.0

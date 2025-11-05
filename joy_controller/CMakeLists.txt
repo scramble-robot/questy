@@ -6,91 +6,50 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(joy REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(std_msgs REQUIRED)
-
-include_directories(
-  include
-)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
 # Create the component library
-add_library(joy_controller_component SHARED
+ament_auto_add_library(joy_controller_component SHARED
   src/joy_controller_component.cpp
 )
 
 target_compile_definitions(joy_controller_component
   PRIVATE "JOY_CONTROLLER_BUILDING_DLL")
 
-ament_target_dependencies(joy_controller_component
-  rclcpp
-  rclcpp_components
-  sensor_msgs
-  geometry_msgs
-  std_msgs
-)
-
 # Register the component
 rclcpp_components_register_nodes(joy_controller_component
   "joy_controller::JoyControllerComponent")
 
-# Create the executable
-add_executable(joy_controller_node
-  src/joy_controller_node.cpp
+# Create the dual stick component library
+ament_auto_add_library(joy_controller_dual_stick_component SHARED
+  src/joy_controller_dual_stick_component.cpp
 )
 
-ament_target_dependencies(joy_controller_node
-  rclcpp
-  rclcpp_components
+target_compile_definitions(joy_controller_dual_stick_component
+  PRIVATE "JOY_CONTROLLER_BUILDING_DLL")
+
+# Register the dual stick component
+rclcpp_components_register_nodes(joy_controller_dual_stick_component
+  "joy_controller::JoyControllerDualStickComponent")
+
+# Create the executable
+ament_auto_add_executable(joy_controller_node
+  src/joy_controller_node.cpp
 )
 
 target_link_libraries(joy_controller_node joy_controller_component)
 
-# Install targets
-install(TARGETS
-  joy_controller_component
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+# Create the dual stick executable
+ament_auto_add_executable(joy_controller_dual_stick_node
+  src/joy_controller_dual_stick_node.cpp
 )
 
-install(TARGETS
-  joy_controller_node
-  DESTINATION lib/joy_controller
-)
-
-install(DIRECTORY
-  include/
-  DESTINATION include
-)
-
-install(DIRECTORY
-  launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
-
-install(DIRECTORY
-  config/
-  DESTINATION share/${PROJECT_NAME}/config
-)
+target_link_libraries(joy_controller_dual_stick_node joy_controller_dual_stick_component)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
-ament_export_libraries(joy_controller_component)
-ament_export_dependencies(
-  rclcpp
-  rclcpp_components
-  sensor_msgs
-  geometry_msgs
-  std_msgs
-)
-
-ament_package()
+ament_auto_package(INSTALL_TO_SHARE launch config)

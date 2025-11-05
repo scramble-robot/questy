@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch arguments -->
+  <arg name="config_file" 
+       default="$(find-pkg-share operation_manager)/config/operation_manager.yaml" 
+       description="Path to operation_manager configuration file" />
+
+  <!-- Operation Manager Node -->
+  <node pkg="operation_manager" 
+        exec="operation_manager_node" 
+        name="operation_manager_node" 
+        output="screen">
+    <param from="$(var config_file)" />
+  </node>
+</launch>

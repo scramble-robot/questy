@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+Joy Controller launch file
+ジョイスティックコントローラとjoyノードを起動
+dual_stick引数でシングルスティック/デュアルスティックモードを切り替え可能
+-->
+<launch>
+    <!-- Launch Arguments -->
+    <arg name="dual_stick" default="true" description="Use dual stick differential drive mode (true) or single stick mode (false)" />
+    <arg name="config_file" default="$(find-pkg-share joy_controller)/config/joy_controller_params.yaml" description="Path to the joy controller configuration file" />
+    <arg name="use_sim_time" default="false" description="Use simulation time" />
+    <arg name="joy_device" default="/dev/input/js0" description="Joystick device path" />
+    <arg name="joy_topic" default="/joy_gated" description="Joy input topic (can be /joy or /joy_gated)" />
+    <arg name="debug_mode" default="false" description="Enable debug mode" />
+
+    <!-- Joy node (from joy package) -->
+    <node pkg="joy" exec="joy_node" name="joy_node" output="screen">
+        <param name="dev" value="$(var joy_device)" />
+        <param name="deadzone" value="0.05" />
+        <param name="autorepeat_rate" value="20.0" />
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <!-- Joy Gate node -->
+    <node pkg="joy_gate" exec="joy_gate_node" name="joy_gate" output="screen">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <!-- Joy controller node (single stick mode) -->
+    <node pkg="joy_controller" exec="joy_controller_node" name="joy_controller" output="screen" unless="$(var dual_stick)">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+        <param name="debug_mode" value="$(var debug_mode)" />
+        <!-- Load parameters from YAML file -->
+        <param from="$(var config_file)" />
+    </node>
+
+    <!-- Joy controller dual stick node (dual stick mode) -->
+    <node pkg="joy_controller" exec="joy_controller_dual_stick_node" name="joy_controller_dual_stick" output="screen" if="$(var dual_stick)">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+        <param name="debug_mode" value="$(var debug_mode)" />
+        <param name="joy_topic" value="$(var joy_topic)" />
+        <!-- Load parameters from YAML file -->
+        <param from="$(var config_file)" />
+    </node>
+
+    <!-- GPIO Reader Node >
+    <node pkg="gpio_reader" exec="gpio_reader_node" name="gpio_reader_node" output="screen">
+        <param from="$(find-pkg-share gpio_reader)/config/gpio_reader.yaml" />
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node> -->
+
+    <!-- Operation Manager Node -->
+    <node pkg="operation_manager" exec="operation_manager_node" name="operation_manager_node" output="screen">
+        <param from="$(find-pkg-share operation_manager)/config/operation_manager.yaml" />
+    </node>
+
+</launch>

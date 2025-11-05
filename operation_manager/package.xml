@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>operation_manager</name>
+  <version>0.0.0</version>
+  <description>Determine whether GPIO IO is controllable by subscribing to GPIO topics.</description>
+  <maintainer email="aki.grade2580@outlook.jp">asa-naki</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>std_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

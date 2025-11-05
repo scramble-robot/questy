@@ -6,14 +6,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(motor_control_lib REQUIRED)
-find_package(joy REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+find_package(motor_control_lib REQUIRED)  # Manual find for local library
+ament_auto_find_build_dependencies()
 
 # Unified motor control node (コメントアウト)
 # add_executable(unified_motor_control_node src/unified_motor_control_node.cpp)
@@ -30,208 +25,75 @@ find_package(joy REQUIRED)
 # )
 
 # Simple test node
-add_executable(simple_test_node src/simple_test_node.cpp)
-target_include_directories(simple_test_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(simple_test_node
-  motor_control_lib
-)
+ament_auto_add_executable(simple_test_node src/simple_test_node.cpp)
+ament_target_dependencies(simple_test_node motor_control_lib)
 
 # Simple motor app
-add_executable(simple_motor_app src/simple_motor_app.cpp)
-target_include_directories(simple_motor_app PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(simple_motor_app
-  rclcpp
-  std_msgs
-  geometry_msgs
-)
+ament_auto_add_executable(simple_motor_app src/simple_motor_app.cpp)
 
 # Drive Component (as a shared library for component loading)
-add_library(drive_component SHARED
+ament_auto_add_library(drive_component SHARED
   src/drive_component.cpp
 )
-target_include_directories(drive_component PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(drive_component
-  rclcpp
-  rclcpp_components
-  std_msgs
-  geometry_msgs
-  motor_control_lib
-)
+ament_target_dependencies(drive_component motor_control_lib)
 
 # Register the component
 rclcpp_components_register_nodes(drive_component "motor_control_app::DriveComponent")
 
 # Single DDT Motor Component (as a shared library for component loading)
-add_library(single_ddt_motor_component SHARED
+ament_auto_add_library(single_ddt_motor_component SHARED
   src/single_ddt_motor_component.cpp
 )
-target_include_directories(single_ddt_motor_component PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(single_ddt_motor_component
-  rclcpp
-  rclcpp_components
-  std_msgs
-  geometry_msgs
-  motor_control_lib
-)
+ament_target_dependencies(single_ddt_motor_component motor_control_lib)
 
 # Register the single DDT motor component
 rclcpp_components_register_nodes(single_ddt_motor_component "motor_control_app::SingleDdtMotorComponent")
 
 # Single DDT Motor Component Node (standalone executable)
-add_executable(single_ddt_motor_node src/single_ddt_motor_node.cpp)
-target_include_directories(single_ddt_motor_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
+ament_auto_add_executable(single_ddt_motor_node src/single_ddt_motor_node.cpp)
 target_link_libraries(single_ddt_motor_node single_ddt_motor_component)
-ament_target_dependencies(single_ddt_motor_node
-  rclcpp
-  motor_control_lib
-)
+ament_target_dependencies(single_ddt_motor_node motor_control_lib)
 
 # Joy Axis Drive Component (as a shared library for component loading)
-add_library(joy_axis_drive_component SHARED
+ament_auto_add_library(joy_axis_drive_component SHARED
   src/joy_axis_drive_component.cpp
 )
-target_include_directories(joy_axis_drive_component PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(joy_axis_drive_component
-  rclcpp
-  rclcpp_components
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  motor_control_lib
-)
+ament_target_dependencies(joy_axis_drive_component motor_control_lib)
 
 # Register the joy axis drive component
 rclcpp_components_register_nodes(joy_axis_drive_component "motor_control_app::JoyAxisDriveComponent")
 
 # Joy Axis Drive Component Node (standalone executable)
-add_executable(joy_axis_drive_node src/joy_axis_drive_node.cpp)
-target_include_directories(joy_axis_drive_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
+ament_auto_add_executable(joy_axis_drive_node src/joy_axis_drive_node.cpp)
 target_link_libraries(joy_axis_drive_node joy_axis_drive_component)
-ament_target_dependencies(joy_axis_drive_node
-  rclcpp
-  motor_control_lib
-)
+ament_target_dependencies(joy_axis_drive_node motor_control_lib)
 
 # Drive Component Node (standalone executable)
-add_executable(drive_component_node src/drive_component_node.cpp)
-target_include_directories(drive_component_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
+ament_auto_add_executable(drive_component_node src/drive_component_node.cpp)
 target_link_libraries(drive_component_node drive_component)
-ament_target_dependencies(drive_component_node
-  rclcpp
-  motor_control_lib
-)
-
-# Individual Motor App (for testing individual motor control)
-add_executable(individual_motor_app src/individual_motor_app.cpp)
-target_include_directories(individual_motor_app PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(individual_motor_app
-  rclcpp
-  std_msgs
-  motor_control_lib
-)
+ament_target_dependencies(drive_component_node motor_control_lib)
 
 # Unified Motor App (using MotorManager)
-add_executable(unified_motor_app src/unified_motor_app.cpp)
-target_include_directories(unified_motor_app PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(unified_motor_app
-  rclcpp
-  std_msgs
-  geometry_msgs
-  motor_control_lib
-)
+ament_auto_add_executable(unified_motor_app src/unified_motor_app.cpp)
+ament_target_dependencies(unified_motor_app motor_control_lib)
 
 # Shot Component (as a shared library for component loading)
-add_library(shot_component SHARED
+ament_auto_add_library(shot_component SHARED
   src/shot_component.cpp
 )
-target_include_directories(shot_component PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-ament_target_dependencies(shot_component
-  rclcpp
-  rclcpp_components
-  std_msgs
-  geometry_msgs
-  sensor_msgs
-  motor_control_lib
-  joy
-)
+ament_target_dependencies(shot_component motor_control_lib)
 
 # Register the shot component
 rclcpp_components_register_nodes(shot_component "motor_control_app::ShotComponent")
 
 # Shot Component Node (standalone executable)
-add_executable(shot_component_node src/shot_component_node.cpp)
-target_include_directories(shot_component_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
+ament_auto_add_executable(shot_component_node src/shot_component_node.cpp)
 target_link_libraries(shot_component_node shot_component)
-ament_target_dependencies(shot_component_node
-  rclcpp
-  motor_control_lib
-)
-
-# Install executables and libraries
-install(TARGETS simple_test_node simple_motor_app drive_component_node individual_motor_app unified_motor_app shot_component_node single_ddt_motor_node joy_axis_drive_node
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-install(TARGETS drive_component shot_component single_ddt_motor_component joy_axis_drive_component
-  EXPORT export_${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-# Install header files
-install(DIRECTORY include/
-  DESTINATION include
-)
-
-# Install config and launch files
-install(DIRECTORY config/
-  DESTINATION share/${PROJECT_NAME}/config
-)
-
-install(DIRECTORY launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
+ament_target_dependencies(shot_component_node motor_control_lib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_package()
+ament_auto_package(INSTALL_TO_SHARE config launch)

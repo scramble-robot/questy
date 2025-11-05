@@ -63,7 +63,7 @@ void JoyControllerDualStickComponent::loadParameters() {
   declare_parameter("left_stick_vertical_axis", 1);  // Left stick vertical = left wheel
   get_parameter("left_stick_vertical_axis", left_stick_vertical_axis_);
 
-  declare_parameter("right_stick_vertical_axis", 3);  // Right stick vertical = right wheel
+  declare_parameter("right_stick_vertical_axis", 4);  // Right stick vertical = right wheel
   get_parameter("right_stick_vertical_axis", right_stick_vertical_axis_);
 
   // Debug mode
@@ -149,9 +149,10 @@ void JoyControllerDualStickComponent::publishTwist(const sensor_msgs::msg::Joy::
   auto twist = geometry_msgs::msg::Twist();
 
   // Convert differential drive wheel speeds to twist
-  // linear.x = (left_velocity + right_velocity) / 2
-  // angular.z = (right_velocity - left_velocity) / wheel_base
-  // For normalized joystick input, we use angular_input_ratio as the conversion factor
+  // For differential drive:
+  // linear.x = (left_velocity + right_velocity) / 2.0 (average of both wheels)
+  // angular.z = (right_velocity - left_velocity) * angular_conversion_factor
+  // The angular_input_ratio acts as a scaling factor for turning sensitivity
 
   twist.linear.x = (left_wheel_velocity + right_wheel_velocity) / 2.0;
   twist.angular.z = (right_wheel_velocity - left_wheel_velocity) * angular_input_ratio_;
@@ -163,11 +164,14 @@ void JoyControllerDualStickComponent::publishTwist(const sensor_msgs::msg::Joy::
 
   if (debug_mode_ && message_count_ % 50 == 0) {
     RCLCPP_INFO(this->get_logger(),
-                "Published twist: linear=[%.3f, %.3f, %.3f], angular=[%.3f, %.3f, %.3f]",
-                twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x, twist.angular.y,
-                twist.angular.z);
-    RCLCPP_INFO(this->get_logger(), "Left wheel: %.3f, Right wheel: %.3f", left_wheel_velocity,
-                right_wheel_velocity);
+                "Input axes - Left[%d]: %.3f, Right[%d]: %.3f",
+                left_stick_vertical_axis_, msg->axes[left_stick_vertical_axis_],
+                right_stick_vertical_axis_, msg->axes[right_stick_vertical_axis_]);
+    RCLCPP_INFO(this->get_logger(), "Wheel velocities - Left: %.3f, Right: %.3f", 
+                left_wheel_velocity, right_wheel_velocity);
+    RCLCPP_INFO(this->get_logger(),
+                "Published twist: linear.x=%.3f, angular.z=%.3f",
+                twist.linear.x, twist.angular.z);
   }
 }
 

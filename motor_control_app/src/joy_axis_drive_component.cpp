@@ -22,7 +22,7 @@ JoyAxisDriveComponent::JoyAxisDriveComponent(const rclcpp::NodeOptions& options)
 
   // ROS 2 通信の設定
   joy_subscription_ = this->create_subscription<sensor_msgs::msg::Joy>(
-      "/joy_gated", 1, std::bind(&JoyAxisDriveComponent::joyCallback, this, std::placeholders::_1));
+      "/joy", 1, std::bind(&JoyAxisDriveComponent::joyCallback, this, std::placeholders::_1));
 
   status_publisher_ = this->create_publisher<std_msgs::msg::String>("motor_status", 10);
 

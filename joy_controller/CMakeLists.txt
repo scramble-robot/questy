@@ -21,12 +21,31 @@ target_compile_definitions(joy_controller_component
 rclcpp_components_register_nodes(joy_controller_component
   "joy_controller::JoyControllerComponent")
 
+# Create the dual stick component library
+ament_auto_add_library(joy_controller_dual_stick_component SHARED
+  src/joy_controller_dual_stick_component.cpp
+)
+
+target_compile_definitions(joy_controller_dual_stick_component
+  PRIVATE "JOY_CONTROLLER_BUILDING_DLL")
+
+# Register the dual stick component
+rclcpp_components_register_nodes(joy_controller_dual_stick_component
+  "joy_controller::JoyControllerDualStickComponent")
+
 # Create the executable
 ament_auto_add_executable(joy_controller_node
   src/joy_controller_node.cpp
 )
 
 target_link_libraries(joy_controller_node joy_controller_component)
+
+# Create the dual stick executable
+ament_auto_add_executable(joy_controller_dual_stick_node
+  src/joy_controller_dual_stick_node.cpp
+)
+
+target_link_libraries(joy_controller_dual_stick_node joy_controller_dual_stick_component)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
